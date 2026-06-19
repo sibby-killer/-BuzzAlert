@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { markAsRead } from "@/app/actions/mentions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,46 @@ interface Mention {
   url: string;
   is_read: boolean;
   created_at: string;
+}
+
+function MentionRow({ mention }: { mention: Mention }) {
+  const [pending, startTransition] = useTransition();
+
+  function handleOpen() {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("mentionId", mention.id);
+      await markAsRead(formData);
+    });
+    window.open(mention.url, "_blank", "noopener,noreferrer");
+  }
+
+  return (
+    <TableRow className={!mention.is_read ? "font-medium" : ""}>
+      <TableCell className="max-w-md truncate">
+        {!mention.is_read && (
+          <Badge variant="secondary" className="mr-2 text-xs">
+            New
+          </Badge>
+        )}
+        {mention.title}
+      </TableCell>
+      <TableCell>r/{mention.subreddit}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {new Date(mention.created_at).toLocaleDateString()}
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleOpen}
+          disabled={pending}
+        >
+          <ExternalLink className="h-4 w-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
 }
 
 export function MentionsTable({ mentions }: { mentions: Mention[] }) {
@@ -43,30 +84,7 @@ export function MentionsTable({ mentions }: { mentions: Mention[] }) {
       </TableHeader>
       <TableBody>
         {mentions.map((mention) => (
-          <TableRow key={mention.id} className={!mention.is_read ? "font-medium" : ""}>
-            <TableCell className="max-w-md truncate">
-              {!mention.is_read && (
-                <Badge variant="secondary" className="mr-2 text-xs">
-                  New
-                </Badge>
-              )}
-              {mention.title}
-            </TableCell>
-            <TableCell>r/{mention.subreddit}</TableCell>
-            <TableCell className="text-muted-foreground">
-              {new Date(mention.created_at).toLocaleDateString()}
-            </TableCell>
-            <TableCell>
-              <div className="flex gap-1">
-                <form action={markAsRead}>
-                  <input type="hidden" name="mentionId" value={mention.id} />
-                  <Button variant="ghost" size="icon" type="submit">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
-            </TableCell>
-          </TableRow>
+          <MentionRow key={mention.id} mention={mention} />
         ))}
       </TableBody>
     </Table>

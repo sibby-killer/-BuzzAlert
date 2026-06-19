@@ -7,6 +7,7 @@ import {
   Hash,
   Bell,
   CreditCard,
+  Settings,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/dashboard/keywords", label: "Keywords", icon: Hash },
   { href: "/dashboard/mentions", label: "Mentions", icon: Bell },
   { href: "/dashboard/upgrade", label: "Upgrade", icon: CreditCard },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
