@@ -46,37 +46,37 @@ alter table public.keywords enable row level security;
 alter table public.mentions enable row level security;
 
 -- Profiles RLS
-create policy "Users can read own profile"
+create policy if not exists "Users can read own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
-create policy "Users can update own profile"
+create policy if not exists "Users can update own profile"
   on public.profiles for update
   using (auth.uid() = id);
 
 -- Keywords RLS
-create policy "Users can insert own keywords"
+create policy if not exists "Users can insert own keywords"
   on public.keywords for insert
   with check (auth.uid() = user_id);
 
-create policy "Users can read own keywords"
+create policy if not exists "Users can read own keywords"
   on public.keywords for select
   using (auth.uid() = user_id);
 
-create policy "Users can update own keywords"
+create policy if not exists "Users can update own keywords"
   on public.keywords for update
   using (auth.uid() = user_id);
 
-create policy "Users can delete own keywords"
+create policy if not exists "Users can delete own keywords"
   on public.keywords for delete
   using (auth.uid() = user_id);
 
 -- Mentions RLS
-create policy "Users can read own mentions"
+create policy if not exists "Users can read own mentions"
   on public.mentions for select
   using (auth.uid() = user_id);
 
-create policy "Users can update own mentions"
+create policy if not exists "Users can update own mentions"
   on public.mentions for update
   using (auth.uid() = user_id);
 
