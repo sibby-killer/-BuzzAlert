@@ -80,6 +80,11 @@ create policy "Users can update own mentions"
   on public.mentions for update
   using (auth.uid() = user_id);
 
+-- Grant service_role access (required for newer Supabase projects)
+grant usage on schema public to service_role;
+grant all privileges on all tables in schema public to service_role;
+grant all privileges on all sequences in schema public to service_role;
+
 -- Function and trigger to auto-create profile on signup
 create or replace function public.handle_new_user()
 returns trigger

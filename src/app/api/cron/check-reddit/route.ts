@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { sendMentionAlert } from "@/emails";
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 function getSupabase() {
-  const { createClient } = require("@supabase/supabase-js");
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
