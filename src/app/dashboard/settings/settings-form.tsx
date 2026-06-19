@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { updateProfile } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
 
 export function SettingsForm({
   email,

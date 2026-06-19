@@ -50,10 +50,8 @@ const plans = [
 
 function PricingCardsInner({
   currentPlan,
-  email,
 }: {
   currentPlan: string;
-  email: string;
 }) {
   const searchParams = useSearchParams();
 
@@ -126,13 +124,10 @@ function PricingCardsInner({
   );
 }
 
-export function PricingCards(props: {
-  currentPlan: string;
-  email: string;
-}) {
+export function PricingCards(props: { currentPlan: string; email: string }) {
   return (
     <Suspense fallback={<div className="text-center">Loading...</div>}>
-      <PricingCardsInner {...props} />
+      <PricingCardsInner currentPlan={props.currentPlan} />
     </Suspense>
   );
 }
