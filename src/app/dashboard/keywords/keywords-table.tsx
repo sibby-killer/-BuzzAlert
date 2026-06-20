@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { AddKeywordModal } from "@/components/AddKeywordModal";
 import { deleteKeyword } from "@/app/actions/keywords";
 import { Button } from "@/components/ui/button";
@@ -20,17 +21,61 @@ interface Keyword {
   created_at: string;
 }
 
+function KeywordRow({ keyword }: { keyword: Keyword }) {
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium">{keyword.keyword}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {new Date(keyword.created_at).toLocaleDateString()}
+      </TableCell>
+      <TableCell>
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={pending}
+          onClick={() => {
+            startTransition(async () => {
+              const result = await deleteKeyword(keyword.id);
+              if (result?.error) {
+                toast.error(result.error);
+              } else {
+                toast.success("Keyword deleted");
+              }
+            });
+          }}
+          className="text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export function KeywordsTable({
   keywords,
   plan,
-  count,
-  limit,
 }: {
   keywords: Keyword[];
   plan: string;
   count: number;
   limit: number;
 }) {
+  if (keywords.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <AddKeywordModal plan={plan} />
+        </div>
+        <div className="text-center py-12 text-muted-foreground">
+          No keywords yet. Add your first keyword to start monitoring.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
@@ -45,43 +90,9 @@ export function KeywordsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {keywords.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={3} className="text-center text-muted-foreground">
-                No keywords yet. Add your first keyword to start monitoring.
-              </TableCell>
-            </TableRow>
-          ) : (
-            keywords.map((kw) => (
-              <TableRow key={kw.id}>
-                <TableCell className="font-medium">{kw.keyword}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {new Date(kw.created_at).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <form
-                    action={async () => {
-                      try {
-                        await deleteKeyword(kw.id);
-                        toast.success("Keyword deleted");
-                      } catch (e: any) {
-                        toast.error(e.message);
-                      }
-                    }}
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      type="submit"
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
+          {keywords.map((kw) => (
+            <KeywordRow key={kw.id} keyword={kw} />
+          ))}
         </TableBody>
       </Table>
     </div>

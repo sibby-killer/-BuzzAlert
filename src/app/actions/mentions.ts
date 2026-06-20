@@ -9,10 +9,10 @@ export async function markAsRead(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return { error: "Not authenticated" };
 
   const mentionId = formData.get("mentionId") as string;
-  if (!mentionId) throw new Error("Missing mention ID");
+  if (!mentionId) return { error: "Missing mention ID" };
 
   const admin = getAdmin();
 
@@ -22,7 +22,8 @@ export async function markAsRead(formData: FormData) {
     .eq("id", mentionId)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/dashboard/mentions");
+  return { success: true };
 }

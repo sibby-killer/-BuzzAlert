@@ -9,10 +9,10 @@ export async function addKeyword(formData: FormData) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return { error: "Not authenticated" };
 
   const keyword = formData.get("keyword") as string;
-  if (!keyword?.trim()) throw new Error("Keyword is required");
+  if (!keyword?.trim()) return { error: "Keyword is required" };
 
   const admin = getAdmin();
 
@@ -32,18 +32,19 @@ export async function addKeyword(formData: FormData) {
   const limit = limits[plan] || 3;
 
   if (count && count >= limit) {
-    throw new Error(
-      `You've reached the ${plan} plan limit of ${limit} keywords. Upgrade to add more.`
-    );
+    return {
+      error: `You've reached the ${plan} plan limit of ${limit} keywords. Upgrade to add more.`,
+    };
   }
 
   const { error } = await admin
     .from("keywords")
     .insert({ user_id: user.id, keyword: keyword.trim().toLowerCase() });
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/dashboard/keywords");
+  return { success: true };
 }
 
 export async function deleteKeyword(keywordId: string) {
@@ -52,7 +53,7 @@ export async function deleteKeyword(keywordId: string) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return { error: "Not authenticated" };
 
   const admin = getAdmin();
 
@@ -62,7 +63,8 @@ export async function deleteKeyword(keywordId: string) {
     .eq("id", keywordId)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { error: error.message };
 
   revalidatePath("/dashboard/keywords");
+  return { success: true };
 }
