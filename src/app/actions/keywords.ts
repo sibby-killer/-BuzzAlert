@@ -1,7 +1,16 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+
+function getAdmin() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+}
 
 export async function addKeyword(formData: FormData) {
   const supabase = await createClient();
@@ -14,12 +23,14 @@ export async function addKeyword(formData: FormData) {
   const keyword = formData.get("keyword") as string;
   if (!keyword?.trim()) throw new Error("Keyword is required");
 
-  const { count } = await supabase
+  const admin = getAdmin();
+
+  const { count } = await admin
     .from("keywords")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id);
 
-  const { data: profile } = await supabase
+  const { data: profile } = await admin
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
@@ -35,7 +46,7 @@ export async function addKeyword(formData: FormData) {
     );
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("keywords")
     .insert({ user_id: user.id, keyword: keyword.trim().toLowerCase() });
 
@@ -52,7 +63,9 @@ export async function deleteKeyword(keywordId: string) {
 
   if (!user) throw new Error("Not authenticated");
 
-  const { error } = await supabase
+  const admin = getAdmin();
+
+  const { error } = await admin
     .from("keywords")
     .delete()
     .eq("id", keywordId)

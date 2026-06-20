@@ -1,7 +1,16 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+
+function getAdmin() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+}
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
@@ -16,7 +25,9 @@ export async function updateProfile(formData: FormData) {
   const redditUsername = formData.get("reddit_username") as string;
   const location = formData.get("location") as string;
 
-  const { error } = await supabase
+  const admin = getAdmin();
+
+  const { error } = await admin
     .from("profiles")
     .update({
       full_name: fullName || null,
