@@ -1,16 +1,7 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-
-function getAdmin() {
-  return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-}
 
 export async function addKeyword(formData: FormData) {
   const supabase = await createClient();

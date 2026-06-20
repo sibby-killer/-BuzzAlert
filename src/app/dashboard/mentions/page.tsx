@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { MentionsTable } from "./mentions-table";
 
@@ -12,7 +12,9 @@ export default async function MentionsPage() {
 
   if (!user) redirect("/login");
 
-  const { data: mentions } = await supabase
+  const admin = getAdmin();
+
+  const { data: mentions } = await admin
     .from("mentions")
     .select("*")
     .eq("user_id", user.id)

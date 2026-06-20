@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "./settings-form";
 
@@ -12,7 +12,9 @@ export default async function SettingsPage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const admin = getAdmin();
+
+  const { data: profile } = await admin
     .from("profiles")
     .select("*")
     .eq("id", user.id)

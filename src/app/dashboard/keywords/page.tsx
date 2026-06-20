@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { KeywordsTable } from "./keywords-table";
 
@@ -12,13 +12,15 @@ export default async function KeywordsPage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const admin = getAdmin();
+
+  const { data: profile } = await admin
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
     .single();
 
-  const { data: keywords } = await supabase
+  const { data: keywords } = await admin
     .from("keywords")
     .select("*")
     .eq("user_id", user.id)

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { PricingCards } from "./pricing-cards";
 
@@ -12,7 +12,9 @@ export default async function UpgradePage() {
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
+  const admin = getAdmin();
+
+  const { data: profile } = await admin
     .from("profiles")
     .select("plan, email")
     .eq("id", user.id)

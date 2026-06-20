@@ -1,18 +1,8 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { createClient as createServiceClient } from "@supabase/supabase-js";
-import { redirect } from "next/navigation";
+import { createClient, getAdmin } from "@/lib/supabase/server";
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
-
-function getAdmin() {
-  return createServiceClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-}
 
 export async function initializePaystack(priceId: string) {
   const supabase = await createClient();
