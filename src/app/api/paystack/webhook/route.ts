@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAdmin } from "@/lib/supabase/server";
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY!;
 
@@ -29,9 +30,9 @@ async function verifyPaystackSignature(body: string, signature: string): Promise
 export async function POST(request: Request) {
   try {
     const body = await request.text();
-    const signature = request.headers.get("x-paystack-signature");
+    const signature = request.headers.get("x-paystack-signature") || "";
 
-    const isValid = await verifyPaystackSignature(body, signature || "");
+    const isValid = await verifyPaystackSignature(body, signature);
     if (!isValid) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
@@ -56,16 +57,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
       }
 
-      const { createClient } = await import("@supabase/supabase-js");
-      const supabaseService = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-          auth: { autoRefreshToken: false, persistSession: false },
-        }
-      );
+      const admin = getAdmin();
 
-      const { error } = await supabaseService
+      const { error } = await admin
         .from("profiles")
         .update({
           plan,

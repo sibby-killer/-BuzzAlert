@@ -39,7 +39,7 @@ export async function initializePaystack(priceId: string) {
       },
       body: JSON.stringify({
         email: profile.email,
-        amount: plan.amount * 100,
+        amount: plan.amount,
         currency: "USD",
         metadata: {
           plan: priceId,
